@@ -54,7 +54,7 @@ class MWOAuth(object):
         def get_mwo_token(token=None):
             return session.get('mwo_token')
 
-        self.bp = Blueprint('simple_page', __name__)
+        self.bp = Blueprint('mwoauth', __name__)
 
         @self.bp.route('/logout')
         def logout():
