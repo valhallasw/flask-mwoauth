@@ -35,10 +35,13 @@ class MWOAuth(object):
     def __init__(self,
                  base_url='https://www.mediawiki.org/w',
                  clean_url='https://www.mediawiki.org/wiki',
+                 default_return_to='index',
                  consumer_key=None, consumer_secret=None):
         if not consumer_key or not consumer_secret:
             raise Exception('MWOAuthBlueprintFactory needs consumer key and secret')
         self.base_url = base_url
+
+        self.default_return_to = default_return_to
 
         self.oauth = OAuth()
         self.mwoauth = MWOAuthRemoteApp(self.oauth, 'mw.org',
@@ -74,7 +77,7 @@ class MWOAuth(object):
         @self.bp.route('/oauth-callback')
         @self.mwoauth.authorized_handler
         def oauth_authorized(resp):
-            next_url = request.args.get('next') or '/'
+            next_url = request.args.get('next') or url_for(self.default_return_to)
             if resp is None:
                 flash(u'You denied the request to sign in.')
                 return redirect(next_url)
