@@ -7,7 +7,7 @@
 # Licensed under the MIT License // http://opensource.org/licenses/MIT
 #
 
-__version__ = '0.1.2'
+__version__ = '0.1.5'
 
 import urllib
 from flask import request, session, redirect, url_for, flash, Blueprint
