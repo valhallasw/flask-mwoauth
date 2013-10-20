@@ -1,7 +1,9 @@
 from setuptools import setup
 
+from flask_mwoauth import __version__
+
 setup(name='flask-mwoauth',
-      version='0.1.2',
+      version=__version__,
       description='Flask blueprint to connect to a MediaWiki OAuth server',
       url='http://github.com/valhallasw/flask-mwoauth',
       author='Merlijn van Deen',

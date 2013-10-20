@@ -6,6 +6,9 @@
 # (C) 2013 Merlijn van Deen <valhallasw@arctus.nl>
 # Licensed under the MIT License // http://opensource.org/licenses/MIT
 #
+
+__version__ = '0.1.2'
+
 import urllib
 from flask import request, session, redirect, url_for, flash, Blueprint
 from flask_oauth import OAuth, OAuthRemoteApp, OAuthException, parse_response
