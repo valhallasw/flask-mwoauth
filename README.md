@@ -1,9 +1,6 @@
-.. image:: https://pypip.in/d/flask-mwoauth/badge.png
-        :target: https://crate.io/packages/flask-mwoauth
-        
-.. image:: https://pypip.in/v/flask-mwoauth/badge.png
-        :target: https://crate.io/packages/flask-mwoauth
-        
+[![Version](https://pypip.in/v/flask-mwoauth/badge.png)](https://crate.io/package/flask-mwoauth)
+[![Downloads](https://pypip.in/d/flask-mwoauth/badge.png)](https://crate.io/package/flask-mwoauth)
+
 flask-mwoauth
 --------------
 
