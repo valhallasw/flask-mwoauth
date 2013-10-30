@@ -47,10 +47,10 @@ class MWOAuth(object):
         self.mwoauth = MWOAuthRemoteApp(self.oauth, 'mw.org',
             base_url = base_url + "/index.php",
             request_token_url=base_url + "/index.php",
-            request_token_params = {'title': 'Special:MWOAuth/initiate',
+            request_token_params = {'title': 'Special:OAuth/initiate',
                                     'oauth_callback': 'oob'},
-            access_token_url=base_url + "/index.php?title=Special:MWOAuth/token",
-            authorize_url=clean_url + '/Special:MWOAuth/authorize',
+            access_token_url=base_url + "/index.php?title=Special:OAuth/token",
+            authorize_url=clean_url + '/Special:OAuth/authorize',
             consumer_key=consumer_key,
             consumer_secret=consumer_secret,
         )
