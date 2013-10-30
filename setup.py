@@ -1,6 +1,6 @@
 from setuptools import setup
 
-from flask_mwoauth import __version__
+exec([l for l in open("flask_mwoauth/__init__.py") if l.startswith('__version__')][0])
 
 setup(name='flask-mwoauth',
       version=__version__,
