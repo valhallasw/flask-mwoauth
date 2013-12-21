@@ -19,7 +19,7 @@ mwoauth = MWOAuth(consumer_key=consumer_key, consumer_secret=consumer_secret)
 app.register_blueprint(mwoauth.bp)
 
 @app.route("/")
-def gcu():
+def index():
     return "logged in as: " + repr(mwoauth.get_current_user(False)) + "<br>" + \
            "<a href=login>login</a> / <a href=logout>logout</a>"
 
