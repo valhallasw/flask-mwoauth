@@ -3,6 +3,17 @@ from flask import Flask
 from flask_mwoauth import MWOAuth
 
 app = Flask(__name__)
+
+# Generate a random secret application key
+# 
+# NOTE: this key changes every invocation. In an actual application, the key
+# should not change! Otherwise you might get a different secret key for
+# different requests, which means you can't read data stored in cookies,
+# which in turn breaks OAuth.
+#
+# So, for an actual application, use app.secret_key = "some long secret key"
+# (which you could generate using os.urandom(24))
+#
 app.secret_key = os.urandom(24)
 
 print """
