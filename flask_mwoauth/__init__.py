@@ -71,6 +71,10 @@ class MWOAuth(object):
         @self.bp.route('/login')
         def login():
             redirector = self.mwoauth.authorize()
+            # proposed ?next= implementation:
+            #if 'next' in request.args:
+            #   something to read the oauth token here
+            #    session.set(oauth_token + '_target') = request.args['next']
             redirector.headers['Location'] += "&oauth_consumer_key=" + self.mwoauth.consumer_key
             return redirector
 
@@ -78,6 +82,9 @@ class MWOAuth(object):
         @self.mwoauth.authorized_handler
         def oauth_authorized(resp):
             next_url = request.args.get('next') or url_for(self.default_return_to)
+            # as proposed ?next= implementation:
+            # next_url = session.get(resp['oauth_token']) or url_for(self.default_return_to)
+
             if resp is None:
                 flash(u'You denied the request to sign in.')
                 return redirect(next_url)
@@ -88,6 +95,7 @@ class MWOAuth(object):
 
             username = self.get_current_user(False)
             flash('You were signed in, %s!' % username)
+            
             return redirect(next_url)
 
     def request(self, api_query):
