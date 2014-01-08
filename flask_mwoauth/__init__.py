@@ -74,8 +74,7 @@ class MWOAuth(object):
 
             if 'next' in request.args:
                 oauth_token = session[self.mwoauth.name + '_oauthtok'][0]
-                session[oauth_token + '_target'] = \
-                    urllib.quote_plus(request.args['next'])
+                session[oauth_token + '_target'] = request.args['next']
 
             redirector.headers['Location'] += "&oauth_consumer_key=" + self.mwoauth.consumer_key
             return redirector
@@ -84,10 +83,10 @@ class MWOAuth(object):
         @self.mwoauth.authorized_handler
         def oauth_authorized(resp):
 
-            next_url = urllib.unquote_plus(
-                session[request.args['oauth_token'] + '_target']
-                ) \
-                or url_for(self.default_return_to)
+            try:
+                next_url = session[request.args['oauth_token'] + '_target']
+            except KeyError:
+                next_url = url_for(self.default_return_to)
 
             if resp is None:
                 flash(u'You denied the request to sign in.')
