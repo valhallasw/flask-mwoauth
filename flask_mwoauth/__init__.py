@@ -82,11 +82,10 @@ class MWOAuth(object):
         @self.bp.route('/oauth-callback')
         @self.mwoauth.authorized_handler
         def oauth_authorized(resp):
+            next_url_key = request.args['oauth_token'] + '_target'
+            default_url = url_for(self.default_return_to)
 
-            try:
-                next_url = session[request.args['oauth_token'] + '_target']
-            except KeyError:
-                next_url = url_for(self.default_return_to)
+            next_url = session.pop(next_url_key, default_url)
 
             if resp is None:
                 flash(u'You denied the request to sign in.')
