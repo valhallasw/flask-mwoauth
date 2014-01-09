@@ -1,6 +1,7 @@
 from setuptools import setup
 
-exec([l for l in open("flask_mwoauth/__init__.py") if l.startswith('__version__')][0])
+exec([l for l in open("flask_mwoauth/__init__.py")
+      if l.startswith('__version__')][0])
 
 setup(name='flask-mwoauth',
       version=__version__,
@@ -10,7 +11,7 @@ setup(name='flask-mwoauth',
       author_email='valhallasw@arctus.nl',
       license='MIT',
       packages=['flask_mwoauth'],
-      install_requires=['flask-oauth'],
+      install_requires=['flask-oauth', 'requests>=2.0.1'],
       zip_safe=True,
       classifiers=[
           "Development Status :: 3 - Alpha",
@@ -19,6 +20,5 @@ setup(name='flask-mwoauth',
           "Operating System :: OS Independent",
           "Programming Language :: Python :: 2",
           "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
-          "Topic :: Software Development :: Libraries :: Python Modules",
-      ]
-)
+          "Topic :: Software Development :: Libraries :: Python Modules"]
+      )
