@@ -9,9 +9,11 @@
 
 __version__ = '0.1.14'
 
+import sys
 import urllib
 from flask import request, session, redirect, url_for, flash, Blueprint
 from flask_oauth import OAuth, OAuthRemoteApp, OAuthException, parse_response
+from requests.models import Request
 
 class MWOAuthRemoteApp(OAuthRemoteApp):
      def handle_oauth1_response(self):
@@ -97,16 +99,57 @@ class MWOAuth(object):
 
             username = self.get_current_user(False)
             flash('You were signed in, %s!' % username)
-            
+
             return redirect(next_url)
+
+    @staticmethod
+    def _prepare_long_request(url, api_query):
+        """ Use requests.Request and requests.PreparedRequest to produce the
+            body (and boundary value) of a multipart/form-data; POST request as
+            detailed in https://www.mediawiki.org/wiki/API:Edit#Large_texts
+        """
+
+        partlist = []
+        for k, v in api_query.iteritems():
+            if k in ('title', 'text', 'summary'):
+                # title,  text and summary values in the request
+                # should be utf-8 encoded
+
+                part = (k,
+                        (None, v.encode('utf-8'),
+                         'text/plain; charset=UTF-8',
+                         {'Content-Transfer-Encoding': '8bit'}
+                         )
+                        )
+            else:
+                part = (k, (None, v))
+            partlist.append(part)
+
+        return Request(url=url, files=partlist).prepare()
 
     def request(self, api_query):
         """ e.g. {'action': 'query', 'meta': 'userinfo'}. format=json not required
             function returns a python dict that resembles the api's json response
         """
         api_query['format'] = 'json'
-        return self.mwoauth.post(self.base_url + "/api.php?" + urllib.urlencode(api_query),
-                                 content_type="text/plain").data
+
+        size = sum([sys.getsizeof(v) for k, v in api_query.iteritems()])
+
+        if size > (1024 * 8):
+            # if request is bigger than 8 kB (the limit is somewhat arbitrary,
+            # see https://www.mediawiki.org/wiki/API:Edit#Large_texts) then
+            # transmit as multipart message
+
+            req = self._prepare_long_request(url=self.base_url + "/api.php?",
+                                             api_query=api_query
+                                             )
+            return self.mwoauth.post(self.base_url + "/api.php?",
+                                     data=req.body,
+                                     content_type=req.headers['Content-Type']
+                                     ).data
+        else:
+            return self.mwoauth.post(self.base_url + "/api.php?" + urllib.urlencode(api_query),
+                                     content_type="text/plain").data
 
     def get_current_user(self, cached=True):
         if cached:
