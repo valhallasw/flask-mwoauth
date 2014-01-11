@@ -11,6 +11,9 @@ Flask blueprint to run OAuth against MediaWiki's extension:OAuth.
 
 The blueprint adds these uris:
  - /login - runs the OAuth handshake and returns the user to /
+ 
+   - /login?next=/someurl will return the user to /someurl
+  
  - /logout - clears the users' access tokens
  - /oauth-callback - callback from MW to finish the handshake
 
