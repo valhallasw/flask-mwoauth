@@ -34,5 +34,5 @@ def index():
     return "logged in as: " + repr(mwoauth.get_current_user(False)) + "<br>" + \
            "<a href=login>login</a> / <a href=logout>logout</a>"
 
-if __name__=="__main__":
+if __name__ == "__main__":
     app.run(debug=True)
