@@ -7,7 +7,7 @@
 # Licensed under the MIT License // http://opensource.org/licenses/MIT
 #
 
-__version__ = '0.1.25'
+__version__ = '0.1.26'
 
 import sys
 import urllib
@@ -127,11 +127,12 @@ class MWOAuth(object):
 
         return Request(url=url, files=partlist).prepare()
 
-    def request(self, api_query):
+    def request(self, api_query, url=None):
         """ e.g. {'action': 'query', 'meta': 'userinfo'}. format=json not required
             function returns a python dict that resembles the api's json response
         """
         api_query['format'] = 'json'
+        url = url or self.base_url
 
         size = sum([sys.getsizeof(v) for k, v in api_query.iteritems()])
 
@@ -140,15 +141,15 @@ class MWOAuth(object):
             # see https://www.mediawiki.org/wiki/API:Edit#Large_texts) then
             # transmit as multipart message
 
-            req = self._prepare_long_request(url=self.base_url + "/api.php?",
+            req = self._prepare_long_request(url=url + "/api.php?",
                                              api_query=api_query
                                              )
-            return self.mwoauth.post(self.base_url + "/api.php?",
+            return self.mwoauth.post(url + "/api.php?",
                                      data=req.body,
                                      content_type=req.headers['Content-Type']
                                      ).data
         else:
-            return self.mwoauth.post(self.base_url + "/api.php?" + urllib.urlencode(api_query),
+            return self.mwoauth.post(url + "/api.php?" + urllib.urlencode(api_query),
                                      content_type="text/plain").data
 
     def get_current_user(self, cached=True):
