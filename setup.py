@@ -6,6 +6,7 @@ exec([l for l in open("flask_mwoauth/__init__.py")
 setup(name='flask-mwoauth',
       version=__version__,
       description='Flask blueprint to connect to a MediaWiki OAuth server',
+      long_description=open('README.rst').read(),
       url='http://github.com/valhallasw/flask-mwoauth',
       author='Merlijn van Deen',
       author_email='valhallasw@arctus.nl',
