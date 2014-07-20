@@ -15,6 +15,9 @@ The blueprint adds these uris:
    - /login?next=/someurl will return the user to /someurl
   
  - /logout - clears the users' access tokens
+
+   - /logout?next=/someurl will return the user to /someurl
+
  - /oauth-callback - callback from MW to finish the handshake
 
 The users' OAuth key and secret are stored in the session.
