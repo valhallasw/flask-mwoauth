@@ -1,7 +1,10 @@
 Flask-mwoauth changelog
 
-
-
+v0.1.34 (Mon Jul 21 06:15:42 CEST 2014)
+========================================
+New feature:
+  - /logout will now also accept a 'next' parameter to forward the user to
+    a nicer 'You have been logged out' page.
 
 v0.1.31 (Tue Jan 14 13:46:10 CET 2014)
 ========================================
