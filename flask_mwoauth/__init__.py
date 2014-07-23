@@ -7,7 +7,7 @@
 # Licensed under the MIT License // http://opensource.org/licenses/MIT
 #
 
-__version__ = '0.1.34'
+__version__ = '0.1.35'
 
 import sys
 import urllib
