@@ -1,7 +1,5 @@
 Flask-mwoauth changelog
 
-
-
 v0.1.35 (Wed Jul 23 05:29:00 CEST 2014)
 ========================================
 Bugfix: Added README.rst to source package to fix pip install.
