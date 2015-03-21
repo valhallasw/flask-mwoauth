@@ -1,5 +1,12 @@
 Flask-mwoauth changelog
 
+
+v0.1.37 (Sat Mar 21 17:48:31 CET 2015)
+========================================
+Feature: allow user to specify App name, which is also used for naming
+         session variables.
+
+
 v0.1.35 (Wed Jul 23 05:29:00 CEST 2014)
 ========================================
 Bugfix: Added README.rst to source package to fix pip install.

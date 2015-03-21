@@ -6,3 +6,4 @@ The following people have contributed to Flask-mwoauth (in alphabetical order):
   * Merlijn van Deen (valhallasw)
   * Kunal Mehta (legoktm)
   * Yuvi Panda (yuvipanda)
+  * Philip Tzou (philiptzou)
