@@ -32,3 +32,30 @@ In addition, flask-mwoauth adds a few convenience functions:
    `request({'action': 'query', 'meta': 'userinfo'})`.
 
 An example app is implemented in `demo.py`.
+
+Using the example app
+---------------------
+1. Go to https://www.mediawiki.org/wiki/Special:OAuthConsumerRegistration/propose and fill in the following values:
+  - Application name: test app
+  - Application description: test app for flask-mwoauth
+  - OAuth "callback" URL: http://localhost:5000/oauth-callback
+  - Contact email address: <your registered email address>
+  - Leave all other values default.
+2. Click 'Propose consumer'. You now get a message stating "Your OAuth consumer request has been received. You have been assigned a consumer token of **<consumer key>** and a secret token of **<consumer secret>**. Please record these for future reference."
+3.
+
+``` bash
+$ python setup.py develop
+$ python demo.py
+NOTE: The callback URL you entered when proposing an OAuth consumer
+probably did not match the URL under which you are running this development
+server. Your redirect back will therefore fail -- please adapt the URL in
+your address bar to http://localhost:5000/oauth-callback?oauth_verifier=...etc
+
+Consumer key: <the consumer key you got>
+Consumer secret: <the consumer secret you got>
+```
+
+You may need to re-enter the key and secret if the app reloads.
+
+4. Go to http://localhost:5000/ and click 'login'.
