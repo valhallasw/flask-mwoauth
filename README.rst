@@ -44,7 +44,7 @@ Using the example app
 2. Click 'Propose consumer'. You now get a message stating "Your OAuth consumer request has been received. You have been assigned a consumer token of **<consumer key>** and a secret token of **<consumer secret>**. Please record these for future reference."
 3.
 
-``` bash
+```
 $ python setup.py develop
 $ python demo.py
 NOTE: The callback URL you entered when proposing an OAuth consumer
