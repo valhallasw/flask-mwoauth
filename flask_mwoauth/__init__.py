@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # MediaWiki OAuth connector for Flask
 #
-# Requires flask-oauth
+# Requires flask-oauthlib
 #
 # (C) 2013 Merlijn van Deen <valhallasw@arctus.nl>
 # Licensed under the MIT License // http://opensource.org/licenses/MIT
