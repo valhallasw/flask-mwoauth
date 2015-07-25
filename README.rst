@@ -1,12 +1,5 @@
 flask-mwoauth
 --------------
-.. image:: https://pypip.in/v/flask-mwoauth/badge.png
-        :target: https://crate.io/packages/flask-mwoauth
-
-.. image:: https://pypip.in/d/flask-mwoauth/badge.png
-        :target: https://crate.io/packages/flask-mwoauth
-	        
-
 Flask blueprint to run OAuth against MediaWiki's extension:OAuth.
 
 The blueprint adds these uris:
