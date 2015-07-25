@@ -12,7 +12,7 @@ setup(name='flask-mwoauth',
       author_email='valhallasw@arctus.nl',
       license='MIT',
       packages=['flask_mwoauth'],
-      install_requires=['flask-oauth', 'requests>=2.0.1'],
+      install_requires=['flask-oauthlib', 'Flask', 'requests>=2.0.1', 'future'],
       zip_safe=True,
       classifiers=[
           "Development Status :: 3 - Alpha",
@@ -20,6 +20,7 @@ setup(name='flask-mwoauth',
           "License :: OSI Approved :: MIT License",
           "Operating System :: OS Independent",
           "Programming Language :: Python :: 2",
+          "Programming Language :: Python :: 3",
           "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
           "Topic :: Software Development :: Libraries :: Python Modules"]
       )

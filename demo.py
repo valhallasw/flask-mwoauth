@@ -1,6 +1,7 @@
 import os
 from flask import Flask
 from flask_mwoauth import MWOAuth
+from builtins import input
 
 app = Flask(__name__)
 
@@ -16,15 +17,15 @@ app = Flask(__name__)
 #
 app.secret_key = os.urandom(24)
 
-print """
+print("""
 NOTE: The callback URL you entered when proposing an OAuth consumer
 probably did not match the URL under which you are running this development
 server. Your redirect back will therefore fail -- please adapt the URL in
 your address bar to http://localhost:5000/oauth-callback?oauth_verifier=...etc
-"""
+""")
 
-consumer_key = raw_input('Consumer key: ')
-consumer_secret = raw_input('Consumer secret: ')
+consumer_key = input('Consumer key: ')
+consumer_secret = input('Consumer secret: ')
 
 mwoauth = MWOAuth(consumer_key=consumer_key, consumer_secret=consumer_secret)
 app.register_blueprint(mwoauth.bp)

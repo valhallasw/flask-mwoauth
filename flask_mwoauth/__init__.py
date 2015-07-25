@@ -10,28 +10,12 @@
 __version__ = '0.1.37'
 
 import sys
-import urllib
+from future.utils import iteritems
+from future.moves.urllib.parse import urlencode
 from flask import request, session, redirect, url_for, flash, Blueprint
-from flask_oauth import OAuth, OAuthRemoteApp, OAuthException, parse_response
+from flask_oauthlib.client import OAuth, OAuthException
 from requests.models import Request
 
-class MWOAuthRemoteApp(OAuthRemoteApp):
-     def handle_oauth1_response(self):
-        """Handles an oauth1 authorization response.  The return value of
-        this method is forwarded as first argument to the handling view
-        function.
-        """
-        client = self.make_client()
-        resp, content = client.request('%s&oauth_verifier=%s' % (
-            self.expand_url(self.access_token_url),
-            request.args['oauth_verifier'],
-        ), self.access_token_method)
-        print resp, content
-        data = parse_response(resp, content)
-        if not self.status_okay(resp):
-            raise OAuthException('Invalid response from ' + self.name,
-                                 type='invalid_response', data=data)
-        return data
 
 class MWOAuth(object):
     def __init__(self,
@@ -46,17 +30,21 @@ class MWOAuth(object):
         self.default_return_to = default_return_to
 
         self.oauth = OAuth()
-        self.mwoauth = MWOAuthRemoteApp(self.oauth, name,
-            base_url = base_url + "/index.php",
-            request_token_url=base_url + "/index.php",
-            request_token_params = {'title': 'Special:OAuth/initiate',
-                                    'oauth_callback': 'oob'},
-            access_token_url=base_url + "/index.php?title=Special:OAuth/token",
+        request_url_params = {'title': 'Special:OAuth/initiate',
+                              'oauth_callback': 'oob'}
+        access_token_params = {'title': 'Special:OAuth/token'}
+        self.mwoauth = self.oauth.remote_app(
+            name,
+            base_url=base_url + "/index.php",
+            request_token_url=base_url + "/index.php?" +
+                              urlencode(request_url_params),
+            request_token_params=None,
+            access_token_url=base_url + "/index.php?" +
+                             urlencode(access_token_params),
             authorize_url=clean_url + '/Special:OAuth/authorize',
             consumer_key=consumer_key,
             consumer_secret=consumer_secret,
         )
-        self.oauth.remote_apps[name] = self.mwoauth
 
         @self.mwoauth.tokengetter
         def get_mwo_token(token=None):
@@ -74,18 +62,18 @@ class MWOAuth(object):
 
         @self.bp.route('/login')
         def login():
-            redirector = self.mwoauth.authorize()
+            uri_params = {'oauth_consumer_key': self.mwoauth.consumer_key}
+            redirector = self.mwoauth.authorize(**uri_params)
 
             if 'next' in request.args:
                 oauth_token = session[self.mwoauth.name + '_oauthtok'][0]
                 session[oauth_token + '_target'] = request.args['next']
 
-            redirector.headers['Location'] += "&oauth_consumer_key=" + self.mwoauth.consumer_key
             return redirector
 
         @self.bp.route('/oauth-callback')
-        @self.mwoauth.authorized_handler
-        def oauth_authorized(resp):
+        def oauth_authorized():
+            resp = self.mwoauth.authorized_response()
             next_url_key = request.args['oauth_token'] + '_target'
             default_url = url_for(self.default_return_to)
 
@@ -112,7 +100,7 @@ class MWOAuth(object):
         """
 
         partlist = []
-        for k, v in api_query.iteritems():
+        for k, v in iteritems(api_query):
             if k in ('title', 'text', 'summary'):
                 # title,  text and summary values in the request
                 # should be utf-8 encoded
@@ -136,7 +124,7 @@ class MWOAuth(object):
         api_query['format'] = 'json'
         url = url or self.base_url
 
-        size = sum([sys.getsizeof(v) for k, v in api_query.iteritems()])
+        size = sum([sys.getsizeof(v) for k, v in iteritems(api_query)])
 
         if size > (1024 * 8):
             # if request is bigger than 8 kB (the limit is somewhat arbitrary,
@@ -151,7 +139,7 @@ class MWOAuth(object):
                                      content_type=req.headers['Content-Type']
                                      ).data
         else:
-            return self.mwoauth.post(url + "/api.php?" + urllib.urlencode(api_query),
+            return self.mwoauth.post(url + "/api.php?" + urlencode(api_query),
                                      content_type="text/plain").data
 
     def get_current_user(self, cached=True):
