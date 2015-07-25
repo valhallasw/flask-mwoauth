@@ -1,5 +1,11 @@
 Flask-mwoauth changelog
 
+v0.2.46 (Sat Jul 25 20:57:31 CEST 2015)
+========================================
+- Python 3.3+ support (thanks, Jan Lebert)
+  - This required a switch to flask-oauthlib
+
+- Doc fixes
 
 v0.1.37 (Sat Mar 21 17:48:31 CET 2015)
 ========================================

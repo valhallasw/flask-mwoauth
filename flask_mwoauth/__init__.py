@@ -7,7 +7,7 @@
 # Licensed under the MIT License // http://opensource.org/licenses/MIT
 #
 
-__version__ = '0.1.37'
+__version__ = '0.2.46'
 
 import sys
 from future.utils import iteritems
