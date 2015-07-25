@@ -24,17 +24,38 @@ The users' OAuth key and secret are stored in the session.
 
 
 In addition, flask-mwoauth adds a few convenience functions:
- - `get_current_user(cached=True)` reports who the current user is. To confirm
+
+1) `get_current_user(cached=True)` reports who the current user is. To confirm
    the user is still logged in (e.g. tokens have not been revoked), call it
    with cached=False.
- - `request(api_query)` submits an request through the API, using the users'
-   access tokens. E.g. the current user request runs
-   `request({'action': 'query', 'meta': 'userinfo'})`.
 
+2) `request(api_query)` submits an request through the API, using the users' access tokens. For instance,
+
+.. code-block:: python
+
+  result = request({'action': 'query', 'meta': 'userinfo'})
+
+fetches https://www.mediawiki.org/w/api.php?action=query&meta=userinfo and returns the result as Python dict, e.g.
+
+.. code-block:: python
+
+  {u'batchcomplete': u'', u'query': {u'userinfo': {u'id': 31344, u'name': u'Valhallasw'}}}
+  
+If you are authorized to access other wikis (e.g. en.wikipedia.org, although you authorized via mediawiki.org), you can run a request there using
+
+.. code-block:: python
+
+  result = request({'action': 'query', 'meta': 'userinfo'}, url='https://en.wikipedia.org/w/api.php')
+
+  
+For more information on using the api, please check the api documentation at https://www.mediawiki.org/wiki/API:Main_page
+  
+  
+
+The example app
+---------------------
 An example app is implemented in `demo.py`.
 
-Using the example app
----------------------
 1. Go to https://www.mediawiki.org/wiki/Special:OAuthConsumerRegistration/propose and fill in the following values:
   - Application name: test app
   - Application description: test app for flask-mwoauth
