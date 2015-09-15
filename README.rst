@@ -49,7 +49,7 @@ The example app
 ---------------------
 An example app is implemented in `demo.py`.
 
-1. Go to https://www.mediawiki.org/wiki/Special:OAuthConsumerRegistration/propose and fill in the following values:
+1. Go to https://meta.wikimedia.org/wiki/Special:OAuthConsumerRegistration/propose and fill in the following values:
   - Application name: test app
   - Application description: test app for flask-mwoauth
   - OAuth "callback" URL: http://localhost:5000/oauth-callback
