@@ -139,8 +139,9 @@ class MWOAuth(object):
                                      content_type=req.headers['Content-Type']
                                      ).data
         else:
-            return self.mwoauth.post(url + "/api.php?" + urlencode(api_query),
-                                     content_type="text/plain").data
+            return self.mwoauth.post(url + "/api.php",
+                                     data=api_query
+                                     ).data
 
     def get_current_user(self, cached=True):
         if cached:
