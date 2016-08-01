@@ -1,5 +1,12 @@
 Flask-mwoauth changelog
 
+
+
+
+v0.2.54 (Mon Aug  1 22:30:29 CEST 2016)
+=======================================
+- Changed documentation from rst to markdown
+
 v0.2.51 (Mon Aug  1 21:53:43 CEST 2016)
 ========================================
 - Updated documentation of OAuth registration URL (Robin Krahl)
