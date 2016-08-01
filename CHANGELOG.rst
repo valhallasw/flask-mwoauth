@@ -1,5 +1,10 @@
 Flask-mwoauth changelog
 
+v0.2.51 (Mon Aug  1 21:53:43 CEST 2016)
+========================================
+- Updated documentation of OAuth registration URL (Robin Krahl)
+- Use POST form data instead of GET parameters (Cristian Consonni)
+
 v0.2.46 (Sat Jul 25 20:57:31 CEST 2015)
 ========================================
 - Python 3.3+ support (thanks, Jan Lebert)
