@@ -1,7 +1,9 @@
 Flask-mwoauth changelog
 
-
-
+v0.3.61 (Sat Feb 11 21:31:49 CET 2017)
+========================================
+- Full rewrite of backend to use the mwoauth library directly (Aaron Halfaker)
+- Improvements of demo scripts to use credentials JSON file (Aaron Halfaker)
 
 v0.2.54 (Mon Aug  1 22:30:29 CEST 2016)
 =======================================

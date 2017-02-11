@@ -14,7 +14,7 @@ import requests
 from requests.models import Request
 from requests_oauthlib import OAuth1
 
-__version__ = '0.2.54'
+__version__ = '0.3.61'
 
 
 class MWOAuth(object):
