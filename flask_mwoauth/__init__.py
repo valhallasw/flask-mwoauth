@@ -6,97 +6,93 @@
 # (C) 2013 Merlijn van Deen <valhallasw@arctus.nl>
 # Licensed under the MIT License // http://opensource.org/licenses/MIT
 #
-
-__version__ = '0.2.54'
-
 import sys
 from future.utils import iteritems
-from future.moves.urllib.parse import urlencode
 from flask import request, session, redirect, url_for, flash, Blueprint
-from flask_oauthlib.client import OAuth, OAuthException
+import mwoauth
+import requests
 from requests.models import Request
+from requests_oauthlib import OAuth1
+
+__version__ = '0.2.54'
 
 
 class MWOAuth(object):
     def __init__(self,
                  base_url='https://www.mediawiki.org/w',
-                 clean_url='https://www.mediawiki.org/wiki',
+                 clean_url="Deprecated",
                  default_return_to='index',
-                 consumer_key=None, consumer_secret=None, name='mw.org'):
-        if not consumer_key or not consumer_secret:
-            raise Exception('MWOAuthBlueprintFactory needs consumer key and secret')
-        self.base_url = base_url
-
+                 consumer_key=None, consumer_secret=None,
+                 name="Deprecated"):
+        if consumer_key is None:
+            raise TypeError(
+                "MWOAuth() missing 1 required argument: 'consumer_key'")
+        if consumer_secret is None:
+            raise TypeError(
+                "MWOAuth() missing 1 required argument: 'consumer_secret'")
+        consumer_token = mwoauth.ConsumerToken(consumer_key, consumer_secret)
         self.default_return_to = default_return_to
+        self.script_url = base_url + "/index.php"
+        self.api_url = base_url + "/api.php"
 
-        self.oauth = OAuth()
-        request_url_params = {'title': 'Special:OAuth/initiate',
-                              'oauth_callback': 'oob'}
-        access_token_params = {'title': 'Special:OAuth/token'}
-        self.mwoauth = self.oauth.remote_app(
-            name,
-            base_url=base_url + "/index.php",
-            request_token_url=base_url + "/index.php?" +
-                              urlencode(request_url_params),
-            request_token_params=None,
-            access_token_url=base_url + "/index.php?" +
-                             urlencode(access_token_params),
-            authorize_url=clean_url + '/Special:OAuth/authorize',
-            consumer_key=consumer_key,
-            consumer_secret=consumer_secret,
-        )
-
-        @self.mwoauth.tokengetter
-        def get_mwo_token(token=None):
-            return session.get('mwo_token')
+        self.handshaker = mwoauth.Handshaker(self.script_url, consumer_token)
 
         self.bp = Blueprint('mwoauth', __name__)
 
         @self.bp.route('/logout')
         def logout():
-            session['mwo_token'] = None
-            session['username'] = None
+            session['mwoauth_access_token'] = None
+            session['mwoauth_username'] = None
             if 'next' in request.args:
                 return redirect(request.args['next'])
             return "Logged out!"
 
         @self.bp.route('/login')
         def login():
-            uri_params = {'oauth_consumer_key': self.mwoauth.consumer_key}
-            redirector = self.mwoauth.authorize(**uri_params)
+            redirect_to, request_token = self.handshaker.initiate()
+            keyed_token_name = _str(request_token.key) + '_request_token'
+            keyed_next_name = _str(request_token.key) + '_next'
+            session[keyed_token_name] = \
+                dict(zip(request_token._fields, request_token))
 
             if 'next' in request.args:
-                oauth_token = session[self.mwoauth.name + '_oauthtok'][0]
-                session[oauth_token + '_target'] = request.args['next']
+                session[keyed_next_name] = request.args.get('next')
+            else:
+                session[keyed_next_name] = self.default_return_to
 
-            return redirector
+            return redirect(redirect_to)
 
         @self.bp.route('/oauth-callback')
         def oauth_authorized():
-            resp = self.mwoauth.authorized_response()
-            next_url_key = request.args['oauth_token'] + '_target'
-            default_url = url_for(self.default_return_to)
+            request_token_key = request.args.get('oauth_token', 'None')
+            keyed_token_name = _str(request_token_key) + '_request_token'
+            keyed_next_name = _str(request_token_key) + '_next'
 
-            next_url = session.pop(next_url_key, default_url)
+            if keyed_token_name not in session:
+                raise Exception("OAuth callback failed.  " +
+                                "Can't find keyed token in session.  " +
+                                "Are cookies disabled?")
 
-            if resp is None:
-                flash(u'You denied the request to sign in.')
-                return redirect(next_url)
-            session['mwo_token'] = (
-                resp['oauth_token'],
-                resp['oauth_token_secret']
-            )
+            access_token = self.handshaker.complete(
+                mwoauth.RequestToken(**session[keyed_token_name]),
+                request.query_string)
+            session['mwoauth_access_token'] = \
+                dict(zip(access_token._fields, access_token))
+
+            next_url = url_for(session[keyed_next_name])
+            del session[keyed_next_name]
+            del session[keyed_token_name]
 
             username = self.get_current_user(False)
-            flash('You were signed in, %s!' % username)
+            flash(u'You were signed in, %s!' % username)
 
             return redirect(next_url)
 
-    @staticmethod
-    def _prepare_long_request(url, api_query):
-        """ Use requests.Request and requests.PreparedRequest to produce the
-            body (and boundary value) of a multipart/form-data; POST request as
-            detailed in https://www.mediawiki.org/wiki/API:Edit#Large_texts
+    def _prepare_long_request(self, url, api_query):
+        """
+        Use requests.Request and requests.PreparedRequest to produce the
+        body (and boundary value) of a multipart/form-data; POST request as
+        detailed in https://www.mediawiki.org/wiki/API:Edit#Large_texts
         """
 
         partlist = []
@@ -115,14 +111,24 @@ class MWOAuth(object):
                 part = (k, (None, v))
             partlist.append(part)
 
-        return Request(url=url, files=partlist).prepare()
+        auth1 = OAuth1(
+            self.consumer_token.key,
+            client_secret=self.consumer_token.secret,
+            resource_owner_key=session['mwoauth_access_token']['key'],
+            resource_owner_secret=session['mwoauth_access_token']['secret'])
+        return Request(
+            url=url, files=partlist, auth=auth1, method="post").prepare()
 
     def request(self, api_query, url=None):
-        """ e.g. {'action': 'query', 'meta': 'userinfo'}. format=json not required
-            function returns a python dict that resembles the api's json response
+        """
+        e.g. {'action': 'query', 'meta': 'userinfo'}. format=json not required
+        function returns a python dict that resembles the api's json response
         """
         api_query['format'] = 'json'
-        url = url or self.base_url
+        if url is not None:
+            api_url = url + "/api.php"
+        else:
+            api_url = self.api_url
 
         size = sum([sys.getsizeof(v) for k, v in iteritems(api_query)])
 
@@ -131,31 +137,38 @@ class MWOAuth(object):
             # see https://www.mediawiki.org/wiki/API:Edit#Large_texts) then
             # transmit as multipart message
 
-            req = self._prepare_long_request(url=url + "/api.php?",
-                                             api_query=api_query
-                                             )
-            return self.mwoauth.post(url + "/api.php?",
-                                     data=req.body,
-                                     content_type=req.headers['Content-Type']
-                                     ).data
+            req = self._prepare_long_request(url=api_url,
+                                             api_query=api_query)
+            req.send()
+            return req.response.text
         else:
-            return self.mwoauth.post(url + "/api.php",
-                                     data=api_query
-                                     ).data
+            return requests.post(api_url, data=api_query).text
 
     def get_current_user(self, cached=True):
         if cached:
-            return session.get('username')
+            return session.get('mwoauth_username')
 
-        try:
-            data = self.request({'action': 'query', 'meta': 'userinfo'})
-            session['username'] = data['query']['userinfo']['name']
-        except KeyError:
-            session['username'] = None
-            if data['error']['code'] == "mwoauth-invalid-authorization":
-                flash(u'Access to this application was revoked. Please re-login!')
-            else:
-                raise
-        except OAuthException:
-            session['username'] = None
-        return session['username']
+        # Get user info
+        identity = self.handshaker.identify(
+            mwoauth.AccessToken(**session['mwoauth_access_token']))
+
+        # Store user info in session
+        session['mwoauth_username'] = identity['username']
+
+        return session['mwoauth_username']
+
+
+def _str(val):
+    """
+    Ensures that the val is the default str() type for python2 or 3
+    """
+    if str == bytes:
+        if isinstance(val, str):
+            return val
+        else:
+            return str(val)
+    else:
+        if isinstance(val, str):
+            return val
+        else:
+            return str(val, 'ascii')
