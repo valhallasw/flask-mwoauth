@@ -50,30 +50,38 @@ class MWOAuth(object):
         @self.bp.route('/login')
         def login():
             redirect_to, request_token = self.handshaker.initiate()
-            session['mwoauth_request_token'] = \
+            keyed_token_name = _str(request_token.key) + '_request_token'
+            keyed_next_name = _str(request_token.key) + '_next'
+            session[keyed_token_name] = \
                 dict(zip(request_token._fields, request_token))
 
             if 'next' in request.args:
-                session['mwoauth_next'] = request.args.get('next')
+                session[keyed_next_name] = request.args.get('next')
             else:
-                session['mwoauth_next'] = self.default_return_to
+                session[keyed_next_name] = self.default_return_to
 
             return redirect(redirect_to)
 
         @self.bp.route('/oauth-callback')
         def oauth_authorized():
-            if 'mwoauth_request_token' not in session:
+            request_token_key = request.args.get('oauth_token', 'None')
+            keyed_token_name = _str(request_token_key) + '_request_token'
+            keyed_next_name = _str(request_token_key) + '_next'
+
+            if keyed_token_name not in session:
                 raise Exception("OAuth callback failed.  " +
+                                "Can't find keyed token in session.  " +
                                 "Are cookies disabled?")
 
             access_token = self.handshaker.complete(
-                mwoauth.RequestToken(**session['mwoauth_request_token']),
+                mwoauth.RequestToken(**session[keyed_token_name]),
                 request.query_string)
             session['mwoauth_access_token'] = \
                 dict(zip(access_token._fields, access_token))
 
-            next_url = url_for(session['mwoauth_next'])
-            del session['mwoauth_next']
+            next_url = url_for(session[keyed_next_name])
+            del session[keyed_next_name]
+            del session[keyed_token_name]
 
             username = self.get_current_user(False)
             flash(u'You were signed in, %s!' % username)
@@ -148,3 +156,19 @@ class MWOAuth(object):
         session['mwoauth_username'] = identity['username']
 
         return session['mwoauth_username']
+
+
+def _str(val):
+    """
+    Ensures that the val is the default str() type for python2 or 3
+    """
+    if str == bytes:
+        if isinstance(val, str):
+            return val
+        else:
+            return str(val)
+    else:
+        if isinstance(val, str):
+            return val
+        else:
+            return str(val, 'ascii')
