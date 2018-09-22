@@ -140,7 +140,7 @@ class MWOAuth(object):
             req = self._prepare_long_request(url=api_url,
                                              api_query=api_query)
             req.send()
-            return req.response.text
+            return req.response.json()
         else:
             auth1 = OAuth1(
                 self.consumer_token.key,
