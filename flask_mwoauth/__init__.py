@@ -45,7 +45,7 @@ class MWOAuth(object):
             session['mwoauth_username'] = None
             if 'next' in request.args:
                 return redirect(request.args['next'])
-            return "Logged out!"
+            return redirect(self.default_return_to)
 
         @self.bp.route('/login')
         def login():
