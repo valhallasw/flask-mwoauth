@@ -142,7 +142,12 @@ class MWOAuth(object):
             req.send()
             return req.response.text
         else:
-            return requests.post(api_url, data=api_query).text
+            auth1 = OAuth1(
+                self.consumer_token.key,
+                client_secret=self.consumer_token.secret,
+                resource_owner_key=session['mwoauth_access_token']['key'],
+                resource_owner_secret=session['mwoauth_access_token']['secret'])
+            return requests.post(api_url, data=api_query, auth=auth1).text
 
     def get_current_user(self, cached=True):
         if cached:
