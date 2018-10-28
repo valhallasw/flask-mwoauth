@@ -23,6 +23,7 @@ class MWOAuth(object):
                  clean_url="Deprecated",
                  default_return_to='index',
                  consumer_key=None, consumer_secret=None,
+                 return_json=False,
                  name="Deprecated"):
         if consumer_key is None:
             raise TypeError(
@@ -32,6 +33,7 @@ class MWOAuth(object):
                 "MWOAuth() missing 1 required argument: 'consumer_secret'")
         consumer_token = mwoauth.ConsumerToken(consumer_key, consumer_secret)
         self.default_return_to = default_return_to
+        self.return_json = return_json
         self.script_url = base_url + "/index.php"
         self.api_url = base_url + "/api.php"
 
@@ -140,9 +142,17 @@ class MWOAuth(object):
             req = self._prepare_long_request(url=api_url,
                                              api_query=api_query)
             req.send()
-            return req.response.text
+            return req.response.json()
         else:
-            return requests.post(api_url, data=api_query).text
+            auth1 = OAuth1(
+                self.consumer_token.key,
+                client_secret=self.consumer_token.secret,
+                resource_owner_key=session['mwoauth_access_token']['key'],
+                resource_owner_secret=session['mwoauth_access_token']['secret'])
+            if self.return_json:
+                return requests.post(api_url, data=api_query, auth=auth1).json()
+            else:
+                return requests.post(api_url, data=api_query, auth=auth1).text
 
     def get_current_user(self, cached=True):
         if cached:
