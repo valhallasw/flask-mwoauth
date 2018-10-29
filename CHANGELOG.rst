@@ -1,5 +1,11 @@
 Flask-mwoauth changelog
 
+v0.3.70 (Mon Oct 29 20:41:06 CET 2018)
+========================================
+- Return to main page instead of showing a blank 'logged out' page (Martin Urbanec)
+- Make sure small requests are also sent authenticated (Martin Urbanec)
+- Allow retrieving JSON from a request directly instead of returning text (Martin Urbanec)
+
 v0.3.61 (Sat Feb 11 21:31:49 CET 2017)
 ========================================
 - Full rewrite of backend to use the mwoauth library directly (Aaron Halfaker)
