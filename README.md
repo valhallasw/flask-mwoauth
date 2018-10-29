@@ -1,3 +1,5 @@
+[![PyPI version](https://badge.fury.io/py/flask-mwoauth.svg)](https://pypi.org/project/flask-mwoauth/)
+
 flask-mwoauth
 --------------
 Flask blueprint to run OAuth against MediaWiki's extension:OAuth.
