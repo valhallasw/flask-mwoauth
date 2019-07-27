@@ -1,5 +1,9 @@
 Flask-mwoauth changelog
 
+v0.4.74 (Sat Jul 27 22:18:07 CEST 2019)
+========================================
+- [backwards incompatible] use url_for to resolve target URL in logout sequence (Martin Urbanec)
+
 v0.3.70 (Mon Oct 29 20:41:06 CET 2018)
 ========================================
 - Return to main page instead of showing a blank 'logged out' page (Martin Urbanec)
