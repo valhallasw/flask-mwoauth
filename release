@@ -1,6 +1,6 @@
 #!/bin/bash
 git diff --quiet && (
-    VERSION=0.3.`git log --oneline | grep -v 'Bump version to' | wc -l` &&
+    VERSION=0.4.`git log --oneline | grep -v 'Bump version to' | wc -l` &&
     echo Bumping version to $VERSION &&
     sed -i -e "s/__version__.*/__version__ = '$VERSION'/" flask_mwoauth/__init__.py  &&
     vim CHANGELOG.rst +3 -c ':read !echo'" -e '\n\nv$VERSION (`date`)\n========================================'"
