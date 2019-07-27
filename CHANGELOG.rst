@@ -1,5 +1,9 @@
 Flask-mwoauth changelog
 
+v0.4.75 (Sat Jul 27 22:23:13 CEST 2019)
+========================================
+- Fix content type in description to allow pypi upload
+
 v0.4.74 (Sat Jul 27 22:18:07 CEST 2019)
 ========================================
 - [backwards incompatible] use url_for to resolve target URL in logout sequence (Martin Urbanec)
