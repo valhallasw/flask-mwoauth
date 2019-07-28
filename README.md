@@ -4,6 +4,8 @@ flask-mwoauth
 --------------
 Flask blueprint to run OAuth against MediaWiki's extension:OAuth.
 
+> **Note**: The [python-mwoauth](https://github.com/mediawiki-utilities/python-mwoauth) library is more actively maintained, and also contains basic flask support. Please consider using `python-mwoauth` directly if it supports your use case.
+
 The blueprint adds these uris:
  - /login - runs the OAuth handshake and returns the user to /
    - /login?next=/someurl will return the user to /someurl
