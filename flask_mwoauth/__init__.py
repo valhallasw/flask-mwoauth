@@ -24,7 +24,8 @@ class MWOAuth(object):
                  default_return_to='index',
                  consumer_key=None, consumer_secret=None,
                  return_json=False,
-                 name="Deprecated"):
+                 name="Deprecated",
+                 user_agent=None):
         if consumer_key is None:
             raise TypeError(
                 "MWOAuth() missing 1 required argument: 'consumer_key'")
@@ -37,7 +38,7 @@ class MWOAuth(object):
         self.script_url = base_url + "/index.php"
         self.api_url = base_url + "/api.php"
 
-        self.handshaker = mwoauth.Handshaker(self.script_url, consumer_token)
+        self.handshaker = mwoauth.Handshaker(self.script_url, consumer_token, user_agent=user_agent)
 
         self.bp = Blueprint('mwoauth', __name__)
 
