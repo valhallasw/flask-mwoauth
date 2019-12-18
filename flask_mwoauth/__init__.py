@@ -170,6 +170,17 @@ class MWOAuth(object):
         session['mwoauth_username'] = identity['username']
 
         return session['mwoauth_username']
+    
+    def get_user_identity(self, cached=True):
+        if cached and session.get('mwoauth_identity'):
+            return session.get('mwoauth_identity')
+        
+        # Get user info
+        identity = self.handshaker.identify(
+            mwoauth.AccessToken(**session['mwoauth_access_token']))
+        
+        session['mwoauth_identity'] = identity
+        return identity
 
 
 def _str(val):
