@@ -181,6 +181,10 @@ class MWOAuth(object):
         
         session['mwoauth_identity'] = identity
         return identity
+    
+    def get_user_identity_from_token(self, access_token_key, access_token_secret):
+        return self.handshaker.identify(
+            mwoauth.AccessToken(key=access_token_key, secret=access_token_secret))
 
 
 def _str(val):
