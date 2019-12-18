@@ -1,5 +1,11 @@
 Flask-mwoauth changelog
 
+v0.4.76 (Wed Dec 18 09:49:00 CEST 2019)
+========================================
+- Add get_user_identity returning full identity object for current user (Martin Urbanec)
+- Add get_user_identity_from_token returning full identity object
+  for token-identified user (Martin Urbanec)
+
 v0.4.75 (Sat Jul 27 22:23:13 CEST 2019)
 ========================================
 - Fix content type in description to allow pypi upload
