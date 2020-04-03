@@ -1,9 +1,11 @@
 Flask-mwoauth changelog
 
-v0.4.76 (Wed Dec 18 09:49:00 CEST 2019)
-
-
 v0.4.81 (Fri Apr  3 16:02:43 DST 2020)
+========================================
+========================================
+- Fix mwoauth.request (Martin Urbanec)
+
+v0.4.76 (Wed Dec 18 09:49:00 CEST 2019)
 ========================================
 ========================================
 - Add get_user_identity returning full identity object for current user (Martin Urbanec)
