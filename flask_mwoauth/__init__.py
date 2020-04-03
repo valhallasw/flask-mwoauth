@@ -32,13 +32,13 @@ class MWOAuth(object):
         if consumer_secret is None:
             raise TypeError(
                 "MWOAuth() missing 1 required argument: 'consumer_secret'")
-        consumer_token = mwoauth.ConsumerToken(consumer_key, consumer_secret)
+        self.consumer_token = mwoauth.ConsumerToken(consumer_key, consumer_secret)
         self.default_return_to = default_return_to
         self.return_json = return_json
         self.script_url = base_url + "/index.php"
         self.api_url = base_url + "/api.php"
 
-        self.handshaker = mwoauth.Handshaker(self.script_url, consumer_token, user_agent=user_agent)
+        self.handshaker = mwoauth.Handshaker(self.script_url, self.consumer_token, user_agent=user_agent)
 
         self.bp = Blueprint('mwoauth', __name__)
 
