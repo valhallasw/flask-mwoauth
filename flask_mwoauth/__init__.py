@@ -91,37 +91,6 @@ class MWOAuth(object):
 
             return redirect(next_url)
 
-    def _prepare_long_request(self, url, api_query):
-        """
-        Use requests.Request and requests.PreparedRequest to produce the
-        body (and boundary value) of a multipart/form-data; POST request as
-        detailed in https://www.mediawiki.org/wiki/API:Edit#Large_texts
-        """
-
-        partlist = []
-        for k, v in iteritems(api_query):
-            if k in ('title', 'text', 'summary'):
-                # title,  text and summary values in the request
-                # should be utf-8 encoded
-
-                part = (k,
-                        (None, v.encode('utf-8'),
-                         'text/plain; charset=UTF-8',
-                         {'Content-Transfer-Encoding': '8bit'}
-                         )
-                        )
-            else:
-                part = (k, (None, v))
-            partlist.append(part)
-
-        auth1 = OAuth1(
-            self.consumer_token.key,
-            client_secret=self.consumer_token.secret,
-            resource_owner_key=session['mwoauth_access_token']['key'],
-            resource_owner_secret=session['mwoauth_access_token']['secret'])
-        return Request(
-            url=url, files=partlist, auth=auth1, method="post").prepare()
-
     def request(self, api_query, url=None):
         """
         e.g. {'action': 'query', 'meta': 'userinfo'}. format=json not required
@@ -135,28 +104,15 @@ class MWOAuth(object):
 
         size = sum([sys.getsizeof(v) for k, v in iteritems(api_query)])
 
-        if size > (1024 * 8):
-            # if request is bigger than 8 kB (the limit is somewhat arbitrary,
-            # see https://www.mediawiki.org/wiki/API:Edit#Large_texts) then
-            # transmit as multipart message
-
-            req = self._prepare_long_request(url=api_url,
-                                             api_query=api_query)
-            req.send()
-            if self.return_json:
-                return req.response.json()
-            else:
-                return req.response.text
+        auth1 = OAuth1(
+            self.consumer_token.key,
+            client_secret=self.consumer_token.secret,
+            resource_owner_key=session['mwoauth_access_token']['key'],
+            resource_owner_secret=session['mwoauth_access_token']['secret'])
+        if self.return_json:
+            return requests.post(api_url, data=api_query, auth=auth1).json()
         else:
-            auth1 = OAuth1(
-                self.consumer_token.key,
-                client_secret=self.consumer_token.secret,
-                resource_owner_key=session['mwoauth_access_token']['key'],
-                resource_owner_secret=session['mwoauth_access_token']['secret'])
-            if self.return_json:
-                return requests.post(api_url, data=api_query, auth=auth1).json()
-            else:
-                return requests.post(api_url, data=api_query, auth=auth1).text
+            return requests.post(api_url, data=api_query, auth=auth1).text
 
     def get_current_user(self, cached=True):
         if cached:
